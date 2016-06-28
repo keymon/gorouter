@@ -27,13 +27,6 @@ type EndpointIterator interface {
 	EndpointFailed()
 }
 
-type endpointIterator struct {
-	pool *Pool
-
-	initialEndpoint string
-	lastEndpoint    *Endpoint
-}
-
 type endpointElem struct {
 	endpoint *Endpoint
 	index    int
@@ -195,7 +188,8 @@ func (p *Pool) removeEndpoint(e *endpointElem) {
 }
 
 func (p *Pool) Endpoints(initial string) EndpointIterator {
-	return newEndpointIterator(p, initial)
+	// default to round robin
+	return NewRoundRobin(p, initial)
 }
 
 func (p *Pool) next() *Endpoint {
@@ -299,35 +293,6 @@ func (p *Pool) MarshalJSON() ([]byte, error) {
 	p.lock.Unlock()
 
 	return json.Marshal(endpoints)
-}
-
-func newEndpointIterator(p *Pool, initial string) EndpointIterator {
-	return &endpointIterator{
-		pool:            p,
-		initialEndpoint: initial,
-	}
-}
-
-func (i *endpointIterator) Next() *Endpoint {
-	var e *Endpoint
-	if i.initialEndpoint != "" {
-		e = i.pool.findById(i.initialEndpoint)
-		i.initialEndpoint = ""
-	}
-
-	if e == nil {
-		e = i.pool.next()
-	}
-
-	i.lastEndpoint = e
-
-	return e
-}
-
-func (i *endpointIterator) EndpointFailed() {
-	if i.lastEndpoint != nil {
-		i.pool.endpointFailed(i.lastEndpoint)
-	}
 }
 
 func (e *endpointElem) failed() {
