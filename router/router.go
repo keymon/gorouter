@@ -292,7 +292,10 @@ func (r *Router) serveHTTPS(server *http.Server, errChan chan error) error {
 
 		r.tlsListener = tlsListener
 		if r.config.EnablePROXY {
-			r.tlsListener = &proxyproto.Listener{tlsListener}
+			r.tlsListener = &proxyproto.Listener{
+				Listener:           tlsListener,
+				ProxyHeaderTimeout: 500 * time.Millisecond,
+			}
 		}
 
 		r.logger.Info(fmt.Sprintf("Listening on %s", r.tlsListener.Addr()))
@@ -319,7 +322,10 @@ func (r *Router) serveHTTP(server *http.Server, errChan chan error) error {
 
 	r.listener = listener
 	if r.config.EnablePROXY {
-		r.listener = &proxyproto.Listener{listener}
+		r.listener = &proxyproto.Listener{
+			Listener:           listener,
+			ProxyHeaderTimeout: 500 * time.Millisecond,
+		}
 	}
 
 	r.logger.Info(fmt.Sprintf("Listening on %s", r.listener.Addr()))

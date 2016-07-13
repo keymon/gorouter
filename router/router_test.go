@@ -595,7 +595,7 @@ var _ = Describe("Router", func() {
 		Expect(string(body)).To(MatchRegexp(".*1\\.2\\.3\\.4:1234.*\n"))
 	})
 
-	It("handles the PROXY protocol", func() {
+	FIt("handles the PROXY protocol", func() {
 		app := testcommon.NewTestApp([]route.Uri{"proxy.vcap.me"}, config.Port, mbusClient, nil, "")
 
 		rCh := make(chan string)
@@ -820,7 +820,7 @@ var _ = Describe("Router", func() {
 	})
 
 	Context("multiple open connections", func() {
-		It("does not hang any connections", func() {
+		FIt("does not hang any connections", func() {
 			app := testcommon.NewTestApp([]route.Uri{"app.vcap.me"}, config.Port, mbusClient, nil, "")
 
 			rCh := make(chan string)
